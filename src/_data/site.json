@@ -1,0 +1,16 @@
+{
+  "title": "Performance-Optimized Blog",
+  "description": "A blazing fast 11ty blog starter with built-in performance optimizations",
+  "url": "https://your-domain.com",
+  "author": "Your Name",
+  "year": "2024",
+  "lang": "en",
+  "locale": "en_US",
+  "performance": {
+    "criticalCss": true,
+    "lazyLoading": true,
+    "imageOptimization": true,
+    "serviceWorker": true,
+    "bundleOptimization": true
+  }
+}
