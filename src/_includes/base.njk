@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }} - {% endif %}{{ site.title }}</title>
+    <meta name="description" content="{{ description or site.description }}">
+    
+    <!-- Performance: DNS prefetch for external resources -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    
+    <!-- Performance: Preconnect to critical external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Performance: Critical CSS inlined -->
+    <style>
+        /* Critical CSS - Above the fold styles */
+        {{ criticalCSS | safe }}
+        
+        /* Base critical styles */
+        *,*::before,*::after{box-sizing:border-box}
+        body{margin:0;font-family:system-ui,-apple-system,sans-serif;line-height:1.6;color:#333}
+        .container{max-width:1200px;margin:0 auto;padding:0 1rem}
+        .header{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100}
+        .nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 0}
+        .nav-brand{font-size:1.5rem;font-weight:bold;text-decoration:none;color:#333}
+        .nav-links{display:flex;gap:1rem;list-style:none;margin:0;padding:0}
+        .nav-links a{text-decoration:none;color:#666;transition:color 0.2s}
+        .nav-links a:hover{color:#333}
+        .main{min-height:calc(100vh - 200px)}
+        
+        /* Performance: Optimize font loading */
+        @font-face{
+            font-family:'Inter';
+            font-style:normal;
+            font-weight:400;
+            font-display:swap;
+            src:url('/assets/fonts/inter-v12-latin-regular.woff2') format('woff2');
+        }
+        @font-face{
+            font-family:'Inter';
+            font-style:normal;
+            font-weight:700;
+            font-display:swap;
+            src:url('/assets/fonts/inter-v12-latin-700.woff2') format('woff2');
+        }
+    </style>
+    
+    <!-- Performance: Preload critical fonts -->
+    <link rel="preload" href="/assets/fonts/inter-v12-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/inter-v12-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Performance: Load non-critical CSS asynchronously -->
+    <link rel="preload" href="/css/styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/css/styles.css"></noscript>
+    
+    <!-- Performance: Resource hints for next page -->
+    {% if page.url != '/' %}
+    <link rel="prefetch" href="/">
+    {% endif %}
+    
+    <!-- SEO and Social -->
+    <meta property="og:title" content="{{ title or site.title }}">
+    <meta property="og:description" content="{{ description or site.description }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- Performance: Avoid render blocking -->
+    <script>
+        // Inline critical JavaScript to avoid render blocking
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <a href="/" class="nav-brand">{{ site.title }}</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/posts/">Posts</a></li>
+                <li><a href="/about/">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="main">
+        {{ content | safe }}
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {{ site.year }} {{ site.title }}. Built with performance in mind.</p>
+        </div>
+    </footer>
+    
+    <!-- Performance: Load non-critical JavaScript asynchronously -->
+    <script src="/js/main.js" async></script>
+    
+    <!-- Performance: Intersection Observer for lazy loading -->
+    <script>
+        if ('IntersectionObserver' in window) {
+            const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+            lazyImages.forEach(img => imageObserver.observe(img));
+        }
+    </script>
+</body>
+</html>
